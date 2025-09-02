@@ -25,4 +25,5 @@ class Sales(models.Model):
     fulfilled_by = models.CharField(max_length=50, null=True, blank=True)
 
     class Meta:
-        db_table = "sales"  # maps to your existing table
+        db_table = "sales"
+        managed = True

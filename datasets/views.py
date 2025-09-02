@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Sum, Count, Min, Max
 from .models import Sales
-from .serializers import SalesSerializer
+from .serializers import SalesSerializer 
 from .pagination import SalesPagination
 from django.db.models import Sum, DecimalField, IntegerField
 from django.db.models.functions import Coalesce
@@ -14,7 +14,6 @@ from rest_framework.decorators import api_view, permission_classes
 
 
 
-# ✅ Get paginated list of sales
 class SalesListView(generics.ListAPIView):
     queryset = Sales.objects.all().order_by("id")  # ensures consistent order
     serializer_class = SalesSerializer
@@ -22,7 +21,6 @@ class SalesListView(generics.ListAPIView):
     pagination_class = SalesPagination
 
 
-# ✅ Get schema info
 class SalesSchemaView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -31,7 +29,6 @@ class SalesSchemaView(APIView):
         return Response(schema)
 
 
-# ✅ Get dataset summary
 class SalesSummaryView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -124,4 +121,54 @@ def orders_by_status(request):
         for item in data
     ]
 
-    return Response(results)
+    return Response(results)   
+ 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def sales_by_region(request):
+    level = request.GET.get("level", "state") 
+    qs = Sales.objects.all()
+
+    if level == "country":
+        data = qs.values("ship_country").annotate(
+            total_orders=Count("id"),
+            total_sales=Sum("amount")
+        )
+        result = [{"region": d["ship_country"], "total_orders": d["total_orders"], "total_sales": d["total_sales"]} for d in data]
+
+    elif level == "city":
+        data = qs.values("ship_city").annotate(
+            total_orders=Count("id"),
+            total_sales=Sum("amount")
+        )
+        result = [{"region": d["ship_city"], "total_orders": d["total_orders"], "total_sales": d["total_sales"]} for d in data]
+
+    else:  # state
+        data = qs.values("ship_state").annotate(
+            total_orders=Count("id"),
+            total_sales=Sum("amount")
+        )
+        result = [{"region": d["ship_state"], "total_orders": d["total_orders"], "total_sales": d["total_sales"]} for d in data]
+
+    return Response(result)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def top_cities(request):
+    limit = int(request.GET.get("limit", 10))
+    qs = Sales.objects.all()
+
+    # Optional date filtering
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
+    if start_date:
+        qs = qs.filter(order_date__gte=start_date)
+    if end_date:
+        qs = qs.filter(order_date__lte=end_date)
+
+    data = qs.values("ship_city", "ship_state").annotate(
+        orders=Count("id")
+    ).order_by("-orders")[:limit]
+
+    result = [{"city": d["ship_city"], "state": d["ship_state"], "orders": d["orders"]} for d in data]
+    return Response(result)

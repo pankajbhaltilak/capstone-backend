@@ -9,5 +9,7 @@ urlpatterns = [
     path("sales-trend/", sales_trend, name="sales-trend"),
     path("sales-by-category/", sales_by_category, name="sales-by-category"),
     path("orders-by-status/", orders_by_status, name="orders-by-status"),
+    path('sales/region/', sales_by_region, name='sales-by-region'),
+    path('sales/top-cities/', top_cities, name='top-cities'),
 
 ]
