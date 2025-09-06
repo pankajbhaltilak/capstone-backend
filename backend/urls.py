@@ -8,16 +8,25 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="My API",
-        default_version='v1',
-        description="API documentation",
-        terms_of_service="https://www.example.com/terms/",
-        contact=openapi.Contact(email="support@example.com"),
+        title="Amazon Sales Dashboard API",
+        default_version="v1",
+        description="""
+        This documentation provides details about the API endpoints 
+        for the Amazon Sales Dashboard project.
+
+        **Key Features:**
+        - Upload CSV files
+        - Track upload logs
+        - Manage sales and reports
+        """,
+        terms_of_service="https://yourdomain.com/terms/",
+        contact=openapi.Contact(email="pankaj.bhaltilak.1@gmail.com"),
         license=openapi.License(name="BSD License"),
     ),
     public=True,
     permission_classes=[permissions.AllowAny],
 )
+
 
 
 urlpatterns = [
