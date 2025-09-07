@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "db_table": "sales",
+                "db_table": "sales_db",
                 "managed": True,
             },
         ),

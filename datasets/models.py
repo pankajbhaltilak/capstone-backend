@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 
 class Sales(models.Model):
     order_id = models.CharField(max_length=50)
@@ -27,3 +29,12 @@ class Sales(models.Model):
     class Meta:
         db_table = "sales"
         managed = True
+
+class CSVUploadLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    file_name = models.CharField(max_length=255)
+    upload_time = models.DateTimeField(auto_now_add=True)
+    row_count = models.IntegerField()
+    
+    def __str__(self):
+        return f"{self.file_name} by {self.user.username}"

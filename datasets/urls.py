@@ -11,5 +11,6 @@ urlpatterns = [
     path("orders-by-status/", orders_by_status, name="orders-by-status"),
     path('sales/region/', sales_by_region, name='sales-by-region'),
     path('sales/top-cities/', top_cities, name='top-cities'),
-
+    path("upload-csv/", upload_csv_file, name="upload-csv-file"),
+    path("csv-upload-logs/", csv_upload_logs, name="csv-upload-logs"),
 ]
