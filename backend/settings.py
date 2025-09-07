@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from decouple import config, Csv
+import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,13 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-173)elq7_en19!va0*yxa77m$beoytye-mmsc7im@9p(@j+cd4"
+# SECRET_KEY = "django-insecure-173)elq7_en19!va0*yxa77m$beoytye-mmsc7im@9p(@j+cd4"
+SECRET_KEY = config("SECRET_KEY", default="unsafe-secret-key")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config("DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1", cast=Csv())
 
 # Application definition
 
@@ -81,13 +84,13 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "ecommerce_dashboard",
-        "USER": "root",
-        "PASSWORD": "Pankaj@123",   # use env variables in production
-        "HOST": "127.0.0.1",
-        "PORT": "3306",
+    'default': {
+        'ENGINE': config("DB_ENGINE", default="django.db.backends.sqlite3"),
+        'NAME': config("DB_NAME", default=os.path.join(BASE_DIR, "db.sqlite3")),
+        'USER': config("DB_USER", default=""),
+        'PASSWORD': config("DB_PASSWORD", default=""),
+        'HOST': config("DB_HOST", default=""),
+        'PORT': config("DB_PORT", default=""),
     }
 }
 
@@ -125,9 +128,13 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_URL = config("MEDIA_URL", default="/media/")
+MEDIA_ROOT = config("MEDIA_ROOT", default=os.path.join(BASE_DIR, "media"))
+
+STATIC_URL = config("STATIC_URL", default="/static/")
+STATIC_ROOT = config("STATIC_ROOT", default=os.path.join(BASE_DIR, "staticfiles"))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -155,6 +162,5 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True 
 MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
 CORS_ALLOWED_ORIGINS = [
-    "https://your-frontend-name.vercel.app",
-    "http://localhost:3000",
+    "http://localhost:5179",
 ]

@@ -18,7 +18,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.decorators import parser_classes
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from .docs import *
 
 class SalesListView(generics.ListAPIView):
     queryset = Sales.objects.all().order_by("id")
@@ -116,7 +116,6 @@ def parse_bool(val: str | None):
 
 class SalesKPISummary(APIView):
     permission_classes = [IsAuthenticated]
-
     def get(self, request):
         total_sales_amount = Sales.objects.aggregate(
             total=Sum("amount", output_field=DecimalField())
@@ -134,7 +133,7 @@ class SalesKPISummary(APIView):
             "total_qty": total_qty,
         })
 
-
+@sales_trend_docs
 @api_view(["GET"])
 @permission_classes([IsAuthenticated]) 
 def sales_trend(request):
@@ -152,6 +151,7 @@ def sales_trend(request):
 
     return Response(results)
 
+@sales_by_category_docs
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def sales_by_category(request):
@@ -169,11 +169,10 @@ def sales_by_category(request):
 
     return Response(results)
 
+@orders_by_status_docs
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])  
 def orders_by_status(request):
-
-    
     data = (
         Sales.objects
         .values("status")
@@ -187,7 +186,8 @@ def orders_by_status(request):
     ]
 
     return Response(results)   
- 
+
+@sales_by_region_docs
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def sales_by_region(request):
@@ -217,6 +217,7 @@ def sales_by_region(request):
 
     return Response(result)
 
+@top_cities_docs
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def top_cities(request):
@@ -239,7 +240,7 @@ def top_cities(request):
     return Response(result)
 
 
-
+@csv_upload_docs
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser])
@@ -277,34 +278,7 @@ def upload_csv_file(request):
     })
 
 
-
-
-@swagger_auto_schema(
-    method='get',
-    operation_description="Retrieve all CSV upload logs, including file name, row count, uploaded by which user, and upload timestamp.",
-    responses={
-        200: openapi.Response(
-            description="List of CSV upload logs",
-            examples={
-                "application/json": [
-                    {
-                        "file_name": "sales_data_2025.csv",
-                        "row_count": 150,
-                        "user": "john_doe",
-                        "upload_time": "2025-09-06 12:34:56"
-                    },
-                    {
-                        "file_name": "sales_data_2024.csv",
-                        "row_count": 200,
-                        "user": "jane_smith",
-                        "upload_time": "2025-08-30 10:20:15"
-                    }
-                ]
-            }
-        ),
-        401: "Unauthorized - Authentication credentials were not provided."
-    }
-)
+@csv_upload_logs_docs
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def csv_upload_logs(request):
