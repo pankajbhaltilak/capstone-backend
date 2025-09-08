@@ -7,6 +7,7 @@ from .serializers import SalesSerializer
 from .pagination import SalesPagination
 from django.db.models import Sum, DecimalField, IntegerField
 from django.db.models.functions import Coalesce
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -22,6 +23,9 @@ from .docs import *
 import logging
 
 logger = logging.getLogger(__name__)
+
+def health_check(request):
+    return JsonResponse({"status": "ok", "message": "Backend is running"}, status=200)
 
 class SalesListView(generics.ListAPIView):
     queryset = Sales.objects.all().order_by("id")
